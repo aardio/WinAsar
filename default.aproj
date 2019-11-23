@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project ver="10" name="WinAsar" libEmbed="true" icon="\app.ico" ui="win" output="WinAsar.exe" CompanyName="aardio" FileDescription="WinAsar" LegalCopyright="Copyright (C) aardio.com 2019" ProductName="WinAsar" InternalName="WinAsar" FileVersion="1.0.0.02" ProductVersion="1.0.0.02" publishDir="/dist/" dstrip="false">
+	<file name="main" path="main.aardio"/>
+	<folder name="forms" path="forms" comment="" embed="true">
+		<file name="extractor.aardio" path="forms\extractor.aardio" comment="forms\extractor.aardio"/>
+		<file name="packer.aardio" path="forms\packer.aardio" comment="forms\packer.aardio"/>
+	</folder>
+</project>

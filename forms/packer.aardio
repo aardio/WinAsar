@@ -1,0 +1,181 @@
+import fonts.fontAwesome;
+import win.ui;
+/*DSG{{*/
+var winform = win.form(text="WinAsar - packer";right=1075;bottom=734;acceptfiles=1;bgcolor=16777215;parent=...)
+winform.add(
+btnBuild={cls="plus";text="Pack";left=805;top=664;right=910;bottom=701;align="left";db=1;dr=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF090';notify=1;textPadding={left=35};z=3};
+btnClear={cls="plus";text="Clear";left=272;top=8;right=355;bottom=43;align="left";dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF1F8';textPadding={left=35};z=8};
+btnOpen={cls="plus";text="Add";left=25;top=8;right=129;bottom=43;align="left";dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF07C';textPadding={left=35};z=5};
+btnRemove={cls="plus";text="Remove";left=135;top=8;right=239;bottom=43;align="left";disabled=1;dl=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF08B';textPadding={left=35};z=9};
+editInfo={cls="richedit";left=371;top=8;right=1064;bottom=655;db=1;dl=1;dr=1;dt=1;edge=1;hscroll=1;multiline=1;vscroll=1;z=2};
+editOutPath={cls="edit";left=138;top=666;right=800;bottom=699;db=1;dl=1;dr=1;edge=1;multiline=1;z=6};
+lbTip={cls="plus";text="Drag and drop files on this form to add them";left=382;top=706;right=663;bottom=728;align="right";db=1;dr=1;transparent=1;z=11};
+plusWebSite={cls="plus";text="Star";left=975;top=698;right=1052;bottom=729;align="left";color=-1;db=1;dr=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(h=-19;name='FontAwesome');padding={left=15;top=1}};iconText='\uF09B';notify=1;textPadding={left=35;bottom=1};z=10};
+progress={cls="plus";left=21;top=710;right=1058;bottom=723;bgcolor=6447459;db=1;dl=1;dr=1;forecolor=9959653;hide=1;max=100;min=0;z=4};
+static={cls="static";text="Archive:";left=42;top=672;right=128;bottom=696;align="right";db=1;dl=1;font=LOGFONT(h=-15);transparent=1;z=7};
+treeview={cls="treeview";left=18;top=51;right=364;bottom=658;bgcolor=16777215;db=1;dl=1;dt=1;edge=1;vscroll=1;z=1}
+)
+/*}}*/
+
+import fsys.asar.writer;
+var asarFile = fsys.asar.writer();
+
+var showAsarInfo = function(){
+	var info,err = asarFile.createInfo(); 
+	if(!info){
+		winform.msgboxErr(err)
+		return;	
+	}
+	winform.treeview.clear();
+	winform.treeview.insertItem(asarFile.treeData()); 
+	winform.editInfo.text = web.json.stringify(asarFile.info,true); 
+	
+	if( ( !# ( ..string.trim( winform.editOutPath.text )) )
+		|| (winform.editOutPath.autoPath = winform.editOutPath.text ) ){
+		winform.editOutPath.text = fsys.path.removeBackslash(asarFile.rootDirectory) + ".asar";
+		winform.editOutPath.autoPath = winform.editOutPath.text;
+	}
+}
+
+winform.btnClear.oncommand = function(id,event){
+	asarFile.clear();
+	winform.treeview.clear();
+	winform.editInfo.text = "";
+	winform.btnRemove.disabled = true;
+}
+
+import fsys.dlg;
+winform.btnOpen.oncommand = function(id,event){
+	var path = fsys.dlg.open("*.*|*.*||","Browse",,winform.hwnd);
+	if(#path){
+		asarFile.add( path );
+		showAsarInfo();
+	} 
+}
+
+winform.wndproc = {
+    [0x233/*_WM_DROPFILES*/] = function(hwnd,message,wParam,lParam){ 
+		var files = win.getDropFile(wParam)
+		if(#files){
+			for(i=1;#files;1){
+				asarFile.add( files[i] );
+			}
+			
+			showAsarInfo();
+		};
+	}
+}
+
+import fsys;
+import win.ui.menu;
+import process;
+winform.treeview.onnotify = function(id,code,ptr){
+ 
+    if( code == 0xFFFFFE3D/*_TVN_SELCHANGEDW*/ ){  
+		var hItem = winform.treeview.getSelection();
+		if(hItem){
+			winform.btnRemove.disabled = false;
+			var data  = winform.treeview.getItemData(hItem);
+			var data = table.clone(data); 
+			for(k,v in data){
+				if( v[["size"]] ) v.size =..math.size64(v.size).format(); 
+			}
+			if( data[["size"]] ) data.size =..math.size64(data.size).format(); 
+			
+            winform.editInfo.text = web.json.stringify(data,true)  
+		}
+		else {
+			winform.btnRemove.disabled = true;
+		}
+    } 
+}
+
+import fsys.dlg;
+import process;
+winform.btnBuild.oncommand = function(id,event){
+	var outpath = winform.editOutPath.text;
+	if(!#outpath){
+		outpath = fsys.dlg.save("*.asar|*.asar||","Browse",,winform.hwnd);
+	} 
+	
+	if(!#outpath) return;
+	if(!..string.endWith(outpath,".asar",true)){
+		winform.msgboxErr("An archive path must end with the '.asar'");
+		winform.editOutPath.setFocus();
+		return;
+	}
+	
+	winform.plusWebSite.hide = true;
+	
+	winform.btnBuild.disabledText = {'\uF254';'\uF251';'\uF252';'\uF253';'\uF250'}
+	winform.progress.hide = false;
+    winform.progress.setProgressRange(1,1000);
+    for(path,size,progress in asarFile.eachPack(outpath)){
+    	winform.progress.progressPos = progress * 1000;
+		win.delay(1)	
+    } 
+	winform.btnBuild.disabledText = null;
+	
+	if( asarFile.lasterr ) winform.msgboxErr(asarFile.lasterr)
+	winform.progress.hide = true;
+	process.explore_select(outpath)
+}
+
+winform.btnRemove.oncommand = function(id,event){
+	var hItem = winform.treeview.getSelection();
+	if(hItem){
+		var path = winform.treeview.getItemPath(hItem);
+		if(asarFile.remove(path)){
+			winform.treeview.delItem(hItem)
+		}
+	}	
+}
+
+winform.btnClear.skin({
+	background={
+		default=0xFF8FB2B0;
+		hover=0xFF928BB3;
+		disabled=0xFFCCCCCC;
+	}
+})
+
+winform.btnOpen.skin({
+	background={
+		default=0xFF8FB2B0;
+		hover=0xFF928BB3;
+		disabled=0xFFCCCCCC; 
+	}
+})
+
+winform.btnRemove.skin({
+	background={
+		default=0xFF8FB2B0;
+		hover=0xFF928BB3;
+		disabled=0xFFCCCCCC;
+	}
+})
+
+winform.btnBuild.skin({
+	background={
+		default=0xFF8FB2B0;
+		hover=0xFF928BB3;
+		disabled=0xFFCCCCCC;
+	}
+})
+
+winform.plusWebSite.skin(
+    color = {  
+        hover = 0xFFFF0000;  
+        active = 0xFF00FF00;  
+    }
+)
+winform.plusWebSite.oncommand = function(id,event){
+	import process
+	process.openUrl("https://github.com/aardio/WinAsar")
+}
+
+winform.enableDpiScaling();
+winform.show();
+
+win.loopMessage();
+return winform;
