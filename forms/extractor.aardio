@@ -6,7 +6,7 @@ winform.add(
 btnExtract={cls="plus";text="Extract";left=805;top=666;right=913;bottom=699;align="left";db=1;dr=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF093';notify=1;textPadding={left=35};z=3};
 btnOpen={cls="plus";text="Open";left=623;top=4;right=868;bottom=37;align="left";dr=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF115';notify=1;textPadding={left=35};z=6};
 btnReplace={cls="plus";text="Save";left=888;top=4;right=1047;bottom=37;align="left";disabled=1;dr=1;dt=1;font=LOGFONT(h=-15);iconStyle={align="left";font=LOGFONT(name='FontAwesome');padding={left=15}};iconText='\uF114';textPadding={left=35};z=9};
-editAsarPath={cls="edit";left=19;top=3;right=617;bottom=40;dl=1;dr=1;dt=1;edge=1;multiline=1;z=5};
+editAsarPath={cls="edit";left=19;top=5;right=617;bottom=36;dl=1;dr=1;dt=1;edge=1;multiline=1;z=5};
 editInfo={cls="richedit";left=371;top=42;right=1058;bottom=654;db=1;dl=1;dr=1;dt=1;edge=1;hscroll=1;multiline=1;vscroll=1;z=2};
 editOutDir={cls="edit";left=138;top=666;right=800;bottom=699;acceptfiles=1;db=1;dl=1;dr=1;edge=1;multiline=1;z=7};
 progress={cls="plus";left=21;top=710;right=1058;bottom=723;bgcolor=6447459;db=1;dl=1;dr=1;forecolor=9959653;hide=1;max=100;min=0;z=4};
